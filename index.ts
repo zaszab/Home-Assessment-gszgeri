@@ -13,14 +13,14 @@ class FS {
     }
   }
 
-  private async Hashales(content: string): Promise<string> {
+  private Hashales(content: string): string {
     const hash = crypto.createHash("md5");
     hash.update(content);
     return hash.digest("hex");
   }
 
   async store(filename: string, content: string): Promise<void> {
-    const hash = await this.Hashales(content);
+    const hash = this.Hashales(content);
 
     const filePath = this.getFilePath(hash);
     if (!nodeFs.existsSync(filePath)) {
