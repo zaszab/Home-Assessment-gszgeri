@@ -8,6 +8,9 @@ class FS {
 
   constructor(directory: string) {
     this.rootDirectory = directory;
+    if (!nodeFs.existsSync(this.hashMapDirectory)) {
+      nodeFs.mkdirSync(this.hashMapDirectory);
+    }
   }
 
   private async Hashales(content: string): Promise<string> {
@@ -26,7 +29,7 @@ class FS {
     const hashPath = this.getHashPath(filename);
     nodeFs.writeFileSync(hashPath, hash);
   }
-  
+
   async get(filename: string): Promise<string | null> {
     const hashPath = this.getHashPath(filename);
 
