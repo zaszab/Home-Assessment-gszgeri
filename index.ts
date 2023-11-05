@@ -8,19 +8,12 @@ class FS {
 
   constructor(directory: string) {
     this.rootDirectory = directory;
-    if (!nodeFs.existsSync(this.hashMapDirectory)) {
-      nodeFs.mkdirSync(this.hashMapDirectory);
-    }
+    this.createDirIfNotExists(this.hashMapDirectory);
+    this.createDirIfNotExists(this.rootDirectory);
   }
 
-  private Hashales(content: string): string {
-    const hash = crypto.createHash("md5");
-    hash.update(content);
-    return hash.digest("hex");
-  }
-
-  async store(filename: string, content: string): Promise<void> {
-    const hash = this.Hashales(content);
+  public async store(filename: string, content: string): Promise<void> {
+    const hash = this.getHash(content);
 
     const filePath = this.getFilePath(hash);
     if (!nodeFs.existsSync(filePath)) {
@@ -30,7 +23,7 @@ class FS {
     nodeFs.writeFileSync(hashPath, hash);
   }
 
-  async get(filename: string): Promise<string | null> {
+  public async get(filename: string): Promise<string | null> {
     const hashPath = this.getHashPath(filename);
 
     try {
@@ -42,6 +35,16 @@ class FS {
     }
   }
 
+  private createDirIfNotExists(directory: string): void {
+    if (!nodeFs.existsSync(directory)) {
+      nodeFs.mkdirSync(directory);
+    }
+  }
+
+  private getHash(content: string): string {
+    return crypto.createHash("md5").update(content).digest("hex");
+  }
+
   private getFilePath(str: string): string {
     return `${this.rootDirectory}/${str}`;
   }
@@ -50,12 +53,13 @@ class FS {
     return `${this.hashMapDirectory}/${str}`;
   }
 }
-const fs = new FS("./topdir");
+const fs = new FS("./topdir2");
 
 (async() => {
   fs.store("elso", "a very long string1");
   fs.store("masodik", "a very long string1");
   fs.store("harmadik", "a very long string3");
+  fs.store("elso", "a very long string3");
   const result1 = await fs.get("elso");
   console.log(result1);
   
